@@ -133,7 +133,50 @@
     .hero-copy { color: var(--muted); font-size: clamp(18px, 2vw, 21px); line-height: 1.6; max-width: 650px; margin-bottom: 30px; }
     .hero-copy strong { color: var(--ink); }
     .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-    .micro { color: var(--faint); font-size: 13px; margin: 15px 0 0; }
+    .cta-caption { color: var(--muted); font-size: 14px; font-weight: 700; margin: 15px 0 0; }
+    .micro { color: var(--faint); font-size: 13px; margin: 9px 0 0; }
+
+    .entry-path { padding: 38px 0 46px; }
+    .entry-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+    .entry-step {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 78px;
+      padding: 17px 18px;
+      border: 1px solid rgba(248,199,61,.30);
+      border-radius: 19px;
+      background: linear-gradient(180deg, rgba(248,199,61,.075), rgba(255,255,255,.018)), var(--coal);
+    }
+    .entry-num {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--grad);
+      color: #171106;
+      font-size: 17px;
+      font-weight: 950;
+    }
+    .entry-step p { margin: 0; font-size: 16px; font-weight: 850; line-height: 1.35; }
+
+    .sticky-cta {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      border-top: 1px solid rgba(248,199,61,.34);
+      background: rgba(5,5,5,.94);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 -14px 38px rgba(0,0,0,.32);
+    }
+    .sticky-cta-inner { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .sticky-cta-text { color: var(--muted); font-size: 13px; font-weight: 800; line-height: 1.35; }
+    .sticky-cta .btn { width: auto; min-height: 46px; flex: 0 0 auto; padding: 12px 18px; }
 
     .growth-card {
       position: relative;
@@ -256,7 +299,9 @@
     .final img { width: 74px; height: 74px; border-radius: 19px; margin: 0 auto 24px; }
     .final h2 { font-size: clamp(39px, 6vw, 68px); line-height: 1.02; letter-spacing: -.05em; max-width: 800px; margin: 0 auto 18px; }
     .final p { color: var(--muted); font-size: 18px; max-width: 640px; margin: 0 auto 28px; line-height: 1.65; }
+    .final .final-cta { min-height: 58px; padding: 16px 28px; font-size: 17px; }
 
+    body { padding-bottom: 74px; }
     footer { border-top: 1px solid rgba(248,199,61,.14); padding: 32px 0 42px; color: var(--faint); font-size: 13px; }
     .footer-inner { display: flex; justify-content: space-between; gap: 28px; }
     footer p { max-width: 760px; line-height: 1.6; margin: 0; }
@@ -287,6 +332,10 @@
       .btn { width: 100%; }
       .hero-actions .btn { width: auto; }
       .price-panel .btn { width: auto; }
+      body { padding-bottom: 86px; }
+      .sticky-cta-inner { min-height: 86px; gap: 12px; }
+      .sticky-cta-text { font-size: 12px; max-width: 132px; }
+      .sticky-cta .btn { width: auto; min-height: 48px; padding: 12px 15px; font-size: 14px; }
     }
   </style>
 </head>
@@ -300,8 +349,8 @@
       <nav class="nav-links" aria-label="Primary">
         <a href="#features">Features</a>
         <a href="#method">Method</a>
-        <a href="#pricing">Pricing</a>
-        <a class="btn btn-gold nav-cta" href="https://overtimemoney.github.io/stock-research/">Take the quiz</a>
+        <a href="#early-access">Early access</a>
+        <a class="btn btn-gold nav-cta" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
       </nav>
     </div>
   </header>
@@ -314,10 +363,11 @@
           <h1>How much more would you make at just <span class="gold-text">5% more</span> per year?</h1>
           <p class="hero-copy">Most people guess “a little more.” The compounding math says otherwise. Stock Research helps you look for that edge with <strong>transparent scores, valuation checks, earnings-cliff warnings, and research tools that show their work</strong>.</p>
           <div class="hero-actions">
-            <a class="btn btn-gold" href="https://overtimemoney.github.io/stock-research/">Take the 60-second quiz <span aria-hidden="true">→</span></a>
+            <a class="btn btn-gold" href="https://overtimemoney.github.io/stock-research/">Continue to the app <span aria-hidden="true">→</span></a>
             <a class="btn btn-dark" href="#features">See how it works</a>
           </div>
-          <p class="micro">Free while in early access. No brokerage connection required.</p>
+          <p class="cta-caption">Starts with 2 quick questions — about 30 seconds — then you're in.</p>
+          <p class="micro">Early-access beta — free for everyone while we gather feedback.</p>
         </div>
 
         <div class="growth-card" aria-label="Hypothetical growth of 500 dollars per month over 40 years at different annual returns">
@@ -369,6 +419,23 @@
         </div>
       </div>
     </div>
+
+    <section class="entry-path" aria-label="How to continue to the app">
+      <div class="wrap entry-steps">
+        <article class="entry-step">
+          <span class="entry-num" aria-hidden="true">1</span>
+          <p>Tap Continue to the app</p>
+        </article>
+        <article class="entry-step">
+          <span class="entry-num" aria-hidden="true">2</span>
+          <p>Answer 2 quick questions</p>
+        </article>
+        <article class="entry-step">
+          <span class="entry-num" aria-hidden="true">3</span>
+          <p>You're in — start researching stocks</p>
+        </article>
+      </div>
+    </section>
 
     <div class="proof-strip" aria-label="Stock Research highlights">
       <div class="wrap proof-grid">
@@ -465,21 +532,19 @@
       </div>
     </section>
 
-    <section id="pricing">
+    <section id="early-access">
       <div class="wrap pricing-card">
         <div class="pricing-copy">
-          <div class="eyebrow">Founding access</div>
+          <div class="eyebrow">Early access</div>
           <h2>Use it free while early access is open.</h2>
-          <p>Help shape the research workflow before paid plans begin. The founding price is planned for early supporters, with the full app available during early access.</p>
-          <p style="color: var(--gold); font-weight: 900;">Founding price $29/mo — free while in early access.</p>
+          <p>Help shape the research workflow while early access is open, with the full app available during the beta.</p>
           <p>Stock Research is an educational tool, not financial advice. Scores and screens organize information; they do not tell you what to buy.</p>
         </div>
         <div class="price-panel">
-          <div class="price-label">Founding price</div>
-          <div class="price">$29<small>/month</small></div>
-          <p>Free while in early access. No payment is being collected on this page.</p>
+          <div class="price-label">Early-access beta</div>
+          <div class="price">Free</div>
           <p>Early-access beta — free for everyone while we gather feedback.</p>
-          <a class="btn" href="https://overtimemoney.github.io/stock-research/">Start with the quiz</a>
+          <a class="btn" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
         </div>
       </div>
     </section>
@@ -487,9 +552,9 @@
     <section class="final">
       <div class="wrap">
         <img src="https://overtimemoney.github.io/stock-research/icon-512.png" alt="Stock Research app icon">
-        <h2>What would an extra 5% do for you?</h2>
-        <p>Take the one-minute quiz, then use the same thinking to inspect a real stock.</p>
-        <a class="btn btn-gold" href="https://overtimemoney.github.io/stock-research/">Take the 60-second quiz <span aria-hidden="true">→</span></a>
+        <h2>Ready when you are</h2>
+        <p>Tap below to continue to the app — 2 quick questions, then you're in.</p>
+        <a class="btn btn-gold final-cta" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
       </div>
     </section>
   </main>
@@ -500,5 +565,12 @@
       <div class="footer-brand">Stock Research</div>
     </div>
   </footer>
+
+  <div class="sticky-cta" aria-label="Continue to the Stock Research app">
+    <div class="wrap sticky-cta-inner">
+      <span class="sticky-cta-text">Free beta · 2 questions · 30 seconds</span>
+      <a class="btn btn-gold" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
+    </div>
+  </div>
 </body>
 </html>
