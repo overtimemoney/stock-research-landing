@@ -301,6 +301,23 @@
     .final p { color: var(--muted); font-size: 18px; max-width: 640px; margin: 0 auto 28px; line-height: 1.65; }
     .final .final-cta { min-height: 58px; padding: 16px 28px; font-size: 17px; }
 
+    #beta-spots { color: var(--gold); font-weight: 800; }
+    .waitlist-form { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+    .waitlist-form input {
+      min-height: 50px;
+      min-width: min(320px, 82vw);
+      padding: 13px 19px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--coal);
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+    }
+    .waitlist-form input::placeholder { color: var(--faint); }
+    .waitlist-form .btn { width: auto; }
+    #waitlist-status { margin-top: 14px; }
+
     body { padding-bottom: 74px; }
     footer { border-top: 1px solid rgba(248,199,61,.14); padding: 32px 0 42px; color: var(--faint); font-size: 13px; }
     .footer-inner { display: flex; justify-content: space-between; gap: 28px; }
@@ -368,6 +385,7 @@
           </div>
           <p class="cta-caption">Starts with 2 quick questions — about 30 seconds — then you're in.</p>
           <p class="micro">Early-access beta — free for everyone while we gather feedback.</p>
+          <p class="micro" id="beta-spots" hidden></p>
         </div>
 
         <div class="growth-card" aria-label="Hypothetical growth of 500 dollars per month over 40 years at different annual returns">
@@ -549,12 +567,22 @@
       </div>
     </section>
 
-    <section class="final">
+    <section class="final" id="waitlist">
       <div class="wrap">
         <img src="https://overtimemoney.github.io/stock-research/icon-512.png" alt="Stock Research app icon">
-        <h2>Ready when you are</h2>
-        <p>Tap below to continue to the app — 2 quick questions, then you're in.</p>
-        <a class="btn btn-gold final-cta" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
+        <h2 id="final-h">Ready when you are</h2>
+        <p id="final-p">Tap below to continue to the app — 2 quick questions, then you're in.</p>
+        <a class="btn btn-gold final-cta" id="final-cta" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
+        <!-- Waitlist mode (beta full): hidden unless the Worker reports
+             every beta spot taken; the script at the bottom of the page
+             swaps this section into the waitlist form then. -->
+        <div id="waitlist-body" hidden>
+          <form class="waitlist-form" id="waitlist-form" novalidate>
+            <input id="waitlist-email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" aria-label="Email address">
+            <button class="btn btn-gold" type="submit">Notify me</button>
+          </form>
+          <p class="micro" id="waitlist-status" role="status"></p>
+        </div>
       </div>
     </section>
   </main>
@@ -572,5 +600,93 @@
       <a class="btn btn-gold" href="https://overtimemoney.github.io/stock-research/">Continue to the app →</a>
     </div>
   </div>
+
+  <script>
+    /* Beta cap awareness. The beta is limited to 50 member accounts;
+     * the count lives in the relay Worker (GET /beta-status). OPEN:
+     * show how many spots are left under the hero CTA. FULL: swap the
+     * journey to waitlist mode — every app CTA becomes "Join the
+     * waitlist" and scrolls to the waitlist form in the final section.
+     * FAIL-OPEN: if the status can't be fetched, the page stays
+     * exactly as it is without this script. */
+    (function () {
+      var WORKER = 'https://stock-research-relay.supplessayings-6e6.workers.dev';
+      var APP_URL = 'https://overtimemoney.github.io/stock-research/';
+
+      var form = document.getElementById('waitlist-form');
+      if (form) {
+        form.addEventListener('submit', function (ev) {
+          ev.preventDefault();
+          var emEl = document.getElementById('waitlist-email');
+          var stEl = document.getElementById('waitlist-status');
+          var email = emEl ? String(emEl.value || '').trim() : '';
+          function say(msg) { if (stEl) stEl.textContent = msg; }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+            say('Enter a valid email address first.');
+            return;
+          }
+          say('Joining the waitlist…');
+          fetch(WORKER + '/beta-waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+          }).then(function (r) {
+            return r.json().catch(function () { return null; }).then(function (j) {
+              if (!r.ok || !j || !j.ok) throw new Error('waitlist rejected');
+              var body = document.getElementById('waitlist-body');
+              if (body) body.innerHTML = '<p class="micro" style="font-size:15px">You\u2019re on the list — we\u2019ll email you when signups open again.</p>';
+            });
+          }).catch(function () {
+            say('Could not join the waitlist — check your connection and try again.');
+          });
+        });
+      }
+
+      function applyFull(cap) {
+        var steps = document.querySelector('.entry-path');
+        if (steps) steps.style.display = 'none';
+        var links = document.querySelectorAll('a[href="' + APP_URL + '"]');
+        for (var i = 0; i < links.length; i++) {
+          links[i].textContent = 'Join the waitlist';
+          links[i].setAttribute('href', '#waitlist');
+        }
+        var h = document.getElementById('final-h');
+        if (h) h.textContent = 'The beta is full';
+        var p = document.getElementById('final-p');
+        if (p) p.textContent = 'All ' + cap + ' beta spots are taken. Leave your email and we\u2019ll notify you when signups open again.';
+        var cta = document.getElementById('final-cta');
+        if (cta) cta.style.display = 'none';
+        var body = document.getElementById('waitlist-body');
+        if (body) body.hidden = false;
+      }
+
+      function apply(st) {
+        if (!st || typeof st.open !== 'boolean') return;
+        var cap = (typeof st.cap === 'number') ? st.cap : 50;
+        var count = (typeof st.count === 'number') ? st.count : 0;
+        if (st.open) {
+          var left = cap - count;
+          if (left > 0) {
+            var line = document.getElementById('beta-spots');
+            if (line) {
+              line.textContent = 'Beta is limited to ' + cap + ' members — ' + left + ' spots left.';
+              line.hidden = false;
+            }
+          }
+        } else {
+          applyFull(cap);
+        }
+      }
+
+      try {
+        var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        var timer = ctrl ? setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, 4000) : null;
+        fetch(WORKER + '/beta-status', ctrl ? { signal: ctrl.signal } : {})
+          .then(function (r) { return r.json(); })
+          .then(function (st) { if (timer) clearTimeout(timer); apply(st); })
+          .catch(function () { if (timer) clearTimeout(timer); /* fail open */ });
+      } catch (e) { /* fail open: page unchanged */ }
+    })();
+  </script>
 </body>
 </html>
