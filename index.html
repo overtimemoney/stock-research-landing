@@ -602,6 +602,26 @@
   </div>
 
   <script>
+    /* Usage counter: one 'landing' tally per browser session, POSTed
+     * to the relay Worker's /stats-hit, which stores a single daily
+     * integer (America/New_York day) — no identity or device data.
+     * Best-effort and silent: if the Worker is unreachable, this page
+     * behaves exactly as it does without this script. */
+    (function () {
+      try {
+        if (sessionStorage.getItem('sr_stat_landing')) return;
+        sessionStorage.setItem('sr_stat_landing', '1');
+        fetch('https://stock-research-relay.supplessayings-6e6.workers.dev/stats-hit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'landing' }),
+          keepalive: true
+        }).catch(function () {});
+      } catch (e) { /* counter is best-effort; page unchanged */ }
+    })();
+  </script>
+
+  <script>
     /* Beta cap awareness. The beta is limited to 50 member accounts;
      * the count lives in the relay Worker (GET /beta-status). OPEN:
      * show how many spots are left under the hero CTA. FULL: swap the
